@@ -9,7 +9,7 @@ use ieee.std_logic_1164.all;
 entity Debounce_Multi_Input is
   generic (
     NUM_INPUTS     : integer := 2;
-    DEBOUNCE_LIMIT : integer := 250000;
+    DEBOUNCE_LIMIT : integer := 250000
     );
   port (
     i_Clk      : in  std_logic;
@@ -20,19 +20,19 @@ end entity Debounce_Multi_Input;
 
 architecture RTL of Debounce_Multi_Input is
 
-  component Debounce_Single_Input is
+  component Debounce_Switch is
     generic (
       DEBOUNCE_LIMIT : integer);
     port (
       i_Clk    : in  std_logic;
       i_Switch : in  std_logic;
       o_Switch : out std_logic);
-  end component Debounce_Single_Input;
+  end component Debounce_Switch;
   
 begin
   
   Output_Assignment: for jj in 0 to NUM_INPUTS-1 generate
-    Debounce_Single_Input_1: Debounce_Single_Input
+    Debounce_Single_Input_1: Debounce_Switch
       generic map (
         DEBOUNCE_LIMIT => DEBOUNCE_LIMIT)
       port map (
