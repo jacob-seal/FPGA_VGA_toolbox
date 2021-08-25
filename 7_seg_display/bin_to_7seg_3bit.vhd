@@ -1,9 +1,22 @@
-----------------------------------------------------------------------
--- converts an incoming binary number to a hex value  
---which corresponds to the proper configuration for a 7 segment
---display output
---only 3 bit since we just need to count to 6. 
-----------------------------------------------------------------------
+----------------------------------------------------------------------------------
+-- Engineer: Jacob Seal
+-- 
+-- Create Date: 07/06/2021
+-- Design Name: Binary to seven segment converter(3 bit)
+-- Module Name: bin_to_7seg.vhd
+-- Target Devices: Digilent Nexys 4(should work on any device)
+-- 
+-- Description:     Accepts a 3 bit binary input value and outputs the appropriate
+--                  line segments to display the HEX digit on a 7 segment display
+-- 
+-- Dependencies: 
+--
+-- Revision:
+-- Revision 0.01 - File Created
+--
+-- Additional Comments: 
+
+----------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;

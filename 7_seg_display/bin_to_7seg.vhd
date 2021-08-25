@@ -1,7 +1,27 @@
+----------------------------------------------------------------------------------
+-- Engineer: Jacob Seal
+-- 
+-- Create Date: 07/06/2021
+-- Design Name: Binary to seven segment converter(4 bit)
+-- Module Name: bin_to_7seg.vhd
+-- Target Devices: Digilent Nexys 4(should work on any device)
+-- 
+-- Description:     Accepts a 4 bit binary input value and outputs the appropriate
+--                  line segments to display the HEX digit on a 7 segment display
+-- 
+-- Dependencies: 
+--
+-- Revision:
+-- Revision 0.01 - File Created
+--
+-- Additional Comments: 
+
+----------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
---input 4 bit binary number, drives signal bit outputs to 7 seg display
+
 entity bin_to_7seg is
 	port(
 		i_Clk : in std_logic;
