@@ -6,8 +6,8 @@
 -- and no parity bit.  When receive is complete o_rx_dv will be
 -- driven high for one clock cycle.
 -- 
--- Set Generic g_CLKS_PER_BIT as follows:
--- g_CLKS_PER_BIT = (Frequency of i_Clk)/(Frequency of UART)
+-- Set constant c_CLKS_PER_BIT as follows:
+-- c_CLKS_PER_BIT = (Frequency of i_Clk)/(Frequency of UART)
 -- Example: 25 MHz Clock, 115200 baud UART
 -- (25000000)/(115200) = 217
 --
@@ -17,7 +17,8 @@ use ieee.numeric_std.all;
 
 entity UART_RX is
   generic (
-    g_CLKS_PER_BIT : integer := 217     -- Needs to be set correctly
+    g_Clk_freq : integer := 100000000;      --clk speed in Hz
+    g_baud_rate : integer := 115200         --desired baud rate
     );
   port (
     i_Clk       : in  std_logic;
@@ -30,12 +31,13 @@ end UART_RX;
 
 architecture RTL of UART_RX is
 
+  constant c_CLKS_PER_BIT : integer := (g_Clk_freq / g_baud_rate);
   type t_SM_Main is (s_Idle, s_RX_Start_Bit, s_RX_Data_Bits,
                      s_RX_Stop_Bit, s_Cleanup);
   signal r_SM_Main : t_SM_Main := s_Idle;
   signal w_SM_Main : std_logic_vector(2 downto 0); -- for simulation only
 
-  signal r_Clk_Count : integer range 0 to g_CLKS_PER_BIT-1 := 0;
+  signal r_Clk_Count : integer range 0 to c_CLKS_PER_BIT-1 := 0;
   signal r_Bit_Index : integer range 0 to 7 := 0;  -- 8 Bits Total
   signal r_RX_Byte   : std_logic_vector(7 downto 0) := (others => '0');
   signal r_RX_DV     : std_logic := '0';
@@ -63,7 +65,7 @@ begin
           
         -- Check middle of start bit to make sure it's still low
         when s_RX_Start_Bit =>
-          if r_Clk_Count = (g_CLKS_PER_BIT-1)/2 then
+          if r_Clk_Count = (c_CLKS_PER_BIT-1)/2 then
             if i_RX_Serial = '0' then
               r_Clk_Count <= 0;  -- reset counter since we found the middle
               r_SM_Main   <= s_RX_Data_Bits;
@@ -76,9 +78,9 @@ begin
           end if;
 
           
-        -- Wait g_CLKS_PER_BIT-1 clock cycles to sample serial data
+        -- Wait c_CLKS_PER_BIT-1 clock cycles to sample serial data
         when s_RX_Data_Bits =>
-          if r_Clk_Count < g_CLKS_PER_BIT-1 then
+          if r_Clk_Count < c_CLKS_PER_BIT-1 then
             r_Clk_Count <= r_Clk_Count + 1;
             r_SM_Main   <= s_RX_Data_Bits;
           else
@@ -98,8 +100,8 @@ begin
 
         -- Receive Stop bit.  Stop bit = 1
         when s_RX_Stop_Bit =>
-          -- Wait g_CLKS_PER_BIT-1 clock cycles for Stop bit to finish
-          if r_Clk_Count < g_CLKS_PER_BIT-1 then
+          -- Wait c_CLKS_PER_BIT-1 clock cycles for Stop bit to finish
+          if r_Clk_Count < c_CLKS_PER_BIT-1 then
             r_Clk_Count <= r_Clk_Count + 1;
             r_SM_Main   <= s_RX_Stop_Bit;
           else

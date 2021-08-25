@@ -36,31 +36,33 @@ USE ieee.numeric_std.ALL;
     -- Component Declarations
     -----------------------------------------------------------------------------
     --UART
-        component UART_RX is
-            generic (
-                    g_CLKS_PER_BIT : integer := 217     -- Needs to be set correctly
-                    );
-            port    (
-                    i_Clk       : in  std_logic;
-                    i_RX_Serial : in  std_logic;
-                    o_RX_DV     : out std_logic;
-                    o_RX_Byte   : out std_logic_vector(7 downto 0)
-                    );
-        end component UART_RX;
+    component UART_RX is
+        generic (
+                g_Clk_freq : integer := 100000000;      --clk speed in Hz
+                g_baud_rate : integer := 115200         --desired baud rate
+                );
+        port    (
+                i_Clk       : in  std_logic;
+                i_RX_Serial : in  std_logic;
+                o_RX_DV     : out std_logic;
+                o_RX_Byte   : out std_logic_vector(7 downto 0)
+                );
+    end component UART_RX;
 
-        component UART_TX is
-            generic (
-                    g_CLKS_PER_BIT : integer := 217     -- Needs to be set correctly
-                    );
-            port    (
-                    i_Clk       : in  std_logic;
-                    i_TX_DV     : in  std_logic;
-                    i_TX_Byte   : in  std_logic_vector(7 downto 0);
-                    o_TX_Active : out std_logic;
-                    o_TX_Serial : out std_logic;
-                    o_TX_Done   : out std_logic
-                    );
-        end component UART_TX;
+    component UART_TX is
+        generic (
+                g_Clk_freq : integer := 100000000;      --clk speed in Hz
+                g_baud_rate : integer := 115200         --desired baud rate
+                );
+        port    (
+                i_Clk       : in  std_logic;
+                i_TX_DV     : in  std_logic;
+                i_TX_Byte   : in  std_logic_vector(7 downto 0);
+                o_TX_Active : out std_logic;
+                o_TX_Serial : out std_logic;
+                o_TX_Done   : out std_logic
+                );
+    end component UART_TX;
 
     --7 segment display
         component bin_to_7seg is
