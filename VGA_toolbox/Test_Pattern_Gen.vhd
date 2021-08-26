@@ -219,12 +219,13 @@ begin
 --                                      else
 --                                            (others => '0');
 
+
 Pattern_Red(2) <= (others => '1') when    (
-                                            ((to_integer(unsigned(w_Col_Count)) - 270 > -1 and
-                                            to_integer(unsigned(w_Row_Count)) - 200 > -1 and
-                                            to_integer(unsigned(w_Col_Count)) - 270 < dual_dice_bitmap(0)'high + 1 and
-                                            to_integer(unsigned(w_Row_Count)) - 200 < dual_dice_bitmap'high + 1) and
-                                            (dual_dice_bitmap(to_integer(unsigned(w_Row_Count)) - 200)(to_integer(unsigned(w_Col_Count)) - 270) = '1'))
+                                            ((to_integer(unsigned(w_Col_Count)) - ((g_ACTIVE_COLS - dual_dice_bitmap(0)'high)/2) > -1 and
+                                            to_integer(unsigned(w_Row_Count)) - ((g_ACTIVE_ROWS - dual_dice_bitmap'high)/2) > -1 and
+                                            to_integer(unsigned(w_Col_Count)) - (g_ACTIVE_COLS - dual_dice_bitmap(0)'high)/2 < dual_dice_bitmap(0)'high + 1 and
+                                            to_integer(unsigned(w_Row_Count)) - ((g_ACTIVE_ROWS - dual_dice_bitmap'high)/2) < dual_dice_bitmap'high + 1) and
+                                            (dual_dice_bitmap(to_integer(unsigned(w_Row_Count)) - ((g_ACTIVE_ROWS - dual_dice_bitmap'high)/2))(to_integer(unsigned(w_Col_Count)) - ((g_ACTIVE_COLS - dual_dice_bitmap(0)'high)/2)) = '1'))
                                              
                                             )
                                      else

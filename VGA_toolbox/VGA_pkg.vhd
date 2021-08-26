@@ -80,13 +80,9 @@ package VGA_pkg is
   -----------------------------------------------------------------------------
   -- Function Declarations
   -----------------------------------------------------------------------------
-    function int_to_str (
-        int : in integer) 
-        return string;
+    function int_to_str (int : in integer) return string;
 
-    function char_to_str (
-        char : in character) 
-        return string;    
+    function char_to_str (char : in std_logic_vector(7 downto 0)) return string;    
 
     
 
@@ -96,9 +92,7 @@ end package VGA_pkg;
 package body VGA_pkg is
 
     --accepts a single character(from ASCII VALUES) and returns it as a string
-    function char_to_str (
-        char : in std_logic_vector(7 downto 0)) 
-        return string is 
+    function char_to_str (char : in std_logic_vector(7 downto 0)) return string is 
 
         variable a : std_logic_vector(7 downto 0);
         variable r : string( 1 to 1);
@@ -176,12 +170,10 @@ package body VGA_pkg is
 
         return r;
     
-    end char_to_str;        
+    end function char_to_str;        
 
     --accepts an integer 0 through 12 and returns it as a string value
-    function int_to_str (
-        int : in integer) 
-        return string is
+    function int_to_str (int : in integer) return string is
 
         variable a : natural := 0;
         variable r : string(1 to 2);
@@ -209,7 +201,7 @@ package body VGA_pkg is
         
         	return r;
          
-    end int_to_str;
+    end function int_to_str;
     
 end package body VGA_pkg;
 
