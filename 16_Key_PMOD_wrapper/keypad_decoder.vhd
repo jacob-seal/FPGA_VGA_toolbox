@@ -77,6 +77,8 @@ begin
                     w_Col<= "1101";
                 when "01100001101010000000" =>
                     w_Col<= "1110";  
+                when others =>
+                    null; 
             end case;
             
         end if;
