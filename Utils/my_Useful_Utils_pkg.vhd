@@ -129,7 +129,27 @@ USE ieee.numeric_std.ALL;
                     i_Ram_Clk: in std_logic; -- clock input for RAM
                     o_Ram_Data_out: out std_logic_vector(7 downto 0) -- Data output of RAM
                     );
-        end component single_port_SRAM;    
+        end component single_port_SRAM; 
+
+        --clock divider
+        component clock_div_pow2 is
+            port    (
+                    i_clk         : in  std_logic;
+                    i_rst         : in  std_logic;
+                    o_clk_div2    : out std_logic;
+                    o_clk_div4    : out std_logic;
+                    o_clk_div8    : out std_logic;
+                    o_clk_div16   : out std_logic
+                    );
+        end component;
+
+  
+
+
+    
+
+        
+ 
 
 
 

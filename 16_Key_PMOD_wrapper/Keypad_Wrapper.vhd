@@ -42,7 +42,7 @@ use ieee.numeric_std.all;
 
 entity Keypad_Wrapper is
   port (
-    --clock input 25 MHz
+    --clock input 100 MHz
 	i_Clk   : in  std_logic;
 	
 	--IO for the rows and columns(PMOD at top level)
@@ -67,6 +67,20 @@ architecture RTL of Keypad_Wrapper is
     signal w_COLS : std_logic_vector(3 downto 0);
     signal w_ROWS : std_logic_vector(3 downto 0);
     signal w_decoded : std_logic_vector(3 downto 0);
+    signal w_decoded_2 : std_logic_vector(3 downto 0);
+    signal w_decoded_3 : std_logic_vector(3 downto 0);
+
+    signal w_clk_div : std_logic;
+
+    component clock_div_pow2 is
+        port(
+            i_clk         : in  std_logic;
+            i_rst         : in  std_logic;
+            o_clk_div2    : out std_logic;
+            o_clk_div4    : out std_logic;
+            o_clk_div8    : out std_logic;
+            o_clk_div16   : out std_logic);
+        end component;
 
 
     component Keypad_Decoder is
@@ -91,11 +105,23 @@ architecture RTL of Keypad_Wrapper is
 	--instantiate all required modules
 	--*****************************************************************************************************************************************
 	
-	--decode keypad input
+	--clock divider to 12.5 MHz
+    --the standard 100 MHz clock is too fast for the keypad timing
+    clock_divider: entity work.clock_div_pow2
+        port map(
+            i_Clk => i_Clk,
+            i_rst => '1',
+            o_clk_div2 => open,
+            o_clk_div4 => open,
+            o_clk_div8 => w_clk_div,
+            o_clk_div16 => open
+        );
+    
+    --decode keypad input
 
     keypad_input_decoder_1 : entity work.Keypad_Decoder
         port map(
-            i_Clk => i_Clk,
+            i_Clk => w_clk_div,
             i_Row => w_Rows,
             o_Col => w_Cols,
             o_Decoded => w_decoded
@@ -131,7 +157,10 @@ architecture RTL of Keypad_Wrapper is
 	
 	
 	
-	
+	--double flop the output of the decoder to prevent metastability
+    w_decoded_2 <= w_decoded; 
+    w_decoded_3 <= w_decoded_2;           
+   
 	
 	--set outputs
     o_COL_4 <= w_COLS(0);
@@ -139,7 +168,7 @@ architecture RTL of Keypad_Wrapper is
     o_COL_2 <= w_COLS(2);
     o_COL_1 <= w_COLS(3);
 
-    o_Decoded <= w_decoded;
+    o_Decoded <= w_decoded_3;
 	
 	
 end RTL;
