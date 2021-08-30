@@ -76,9 +76,9 @@ begin
                 when "01001001001111100000" =>
                     w_Col<= "1101";
                 when "01100001101010000000" =>
-                    w_Col<= "1110";  
+                    w_Col<= "1110"; 
                 when others =>
-                    null; 
+                    null;     
             end case;
             
         end if;
