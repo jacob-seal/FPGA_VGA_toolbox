@@ -90,6 +90,7 @@ architecture RTL of Test_Pattern_Gen is
     signal pixel : std_logic;
     --counter to increment through the string array "stringmap"
     signal r_string_counter : integer range 0 to stringmap'high := 0;
+    signal r_chip_counter : integer range 0 to c_x_pos_chipmap'high := 0;
     --connects the stringmap array to the input of Pixel On Text
     signal w_string : string (1 to stringmap(0)'high);
     --registers the input pattern signal
@@ -97,6 +98,11 @@ architecture RTL of Test_Pattern_Gen is
     --connects x and y position arrays to input of Pixel On Text
     signal w_x_pos_text : integer range 0 to 2**w_Col_Count'length;
     signal w_y_pos_text : integer range 0 to 2**w_Row_Count'length;
+    signal w_x_pos_chip : integer range 0 to 2**w_Col_Count'length;
+    signal w_y_pos_chip : integer range 0 to 2**w_Row_Count'length;
+
+    signal draw_table : std_logic;
+    signal draw_chip  : std_logic;
 
 
   --signal r_string_zero_flag : integer := 0;
@@ -204,37 +210,104 @@ begin
   
   
 --   Pattern_Red(2) <= (others => '1') when    (
---                                             ((to_integer(unsigned(w_Col_Count)) - 123 > -1 and
---                                             to_integer(unsigned(w_Row_Count)) - 150 > -1 and
---                                             to_integer(unsigned(w_Col_Count)) - 123 < c_dicemap(1)(0)'high + 1 and
---                                             to_integer(unsigned(w_Row_Count)) - 150 < c_dicemap(1)'high + 1) and
---                                             (c_dicemap(1)(to_integer(unsigned(w_Row_Count)) - 150)(to_integer(unsigned(w_Col_Count)) - 123) = '1'))
---                                              or
---                                              ((to_integer(unsigned(w_Col_Count)) - 370 > -1 and
---                                              to_integer(unsigned(w_Row_Count)) - 150 > -1 and
---                                              to_integer(unsigned(w_Col_Count)) - 370 < c_dicemap(3)(0)'high + 1 and
---                                              to_integer(unsigned(w_Row_Count)) - 150 < c_dicemap(3)'high + 1) and
---                                              (c_dicemap(3)(to_integer(unsigned(w_Row_Count)) - 150)(to_integer(unsigned(w_Col_Count)) - 370) = '1'))
+--                                             ((to_integer(unsigned(w_Col_Count)) - 0 > -1 and
+--                                             to_integer(unsigned(w_Row_Count)) - 0 > -1 and
+--                                             to_integer(unsigned(w_Col_Count)) - 0 < craps_table_bitmap(0)'high + 1 and
+--                                             to_integer(unsigned(w_Row_Count)) - 0 < craps_table_bitmap'high + 1) and
+--                                             (craps_table_bitmap(to_integer(unsigned(w_Row_Count)) - 0)(to_integer(unsigned(w_Col_Count)) - 0) = '1'))
+--                                             or 
+--                                             ((to_integer(unsigned(w_Col_Count)) - 80 > -1 and
+--                                             to_integer(unsigned(w_Row_Count)) - 100 > -1 and
+--                                             to_integer(unsigned(w_Col_Count)) - 80 < dot(0)'high + 1 and
+--                                             to_integer(unsigned(w_Row_Count)) - 100 < dot'high + 1) and
+--                                             (dot(to_integer(unsigned(w_Row_Count)) - 100)(to_integer(unsigned(w_Col_Count)) - 80) = '1'))
+                                             
+--                                             )
+--                                      else
+--                                            (others => '0');
+    draw_table <= '1' when                  ((to_integer(unsigned(w_Col_Count)) - 0 > -1 and
+                                            to_integer(unsigned(w_Row_Count)) - 0 > -1 and
+                                            to_integer(unsigned(w_Col_Count)) - 0 < craps_table_bitmap(0)'high + 1 and
+                                            to_integer(unsigned(w_Row_Count)) - 0 < craps_table_bitmap'high + 1) and
+                                            (craps_table_bitmap(to_integer(unsigned(w_Row_Count)) - 0)(to_integer(unsigned(w_Col_Count)) - 0) = '1'))
+                                            
+                                            else 
+                                                '0';
+
+    draw_chip <= '1' when                   ((to_integer(unsigned(w_Col_Count)) - w_x_pos_chip > -1 and
+                                            to_integer(unsigned(w_Row_Count)) - w_y_pos_chip > -1 and
+                                            to_integer(unsigned(w_Col_Count)) - w_x_pos_chip < dot(0)'high + 1 and
+                                            to_integer(unsigned(w_Row_Count)) - w_y_pos_chip < dot'high + 1) and
+                                            (dot(to_integer(unsigned(w_Row_Count)) - w_y_pos_chip)(to_integer(unsigned(w_Col_Count)) - w_x_pos_chip) = '1'))
+                                            
+                                            else
+                                                '0';     
+
+    process (i_Clk)
+    begin
+        if rising_edge(i_Clk) then
+            if draw_chip = '1' then
+                 Pattern_Red(2) <= (others => '1');
+                 Pattern_Grn(2) <= (others => '0');
+                 Pattern_Blu(2) <= (others => '0');
+            elsif draw_table = '1' then 
+                Pattern_Red(2) <= (others => '1');
+                Pattern_Grn(2) <= (others => '1');
+                Pattern_Blu(2) <= (others => '1');    
+            else
+                Pattern_Red(2) <= (others => '0');
+                Pattern_Grn(2) <= (others => '0');
+                Pattern_Blu(2) <= (others => '0');                   
+            end if;
+            
+        end if;
+        
+    end process;   
+
+
+    -- Increment counter to cycle through the array of chip positions
+  chip_counter : process (i_Clk) is 
+  
+  begin
+    if rising_edge(i_clk) then 
+        r_i_Pattern <= i_Pattern;                               --registered version of input pattern
+        if i_Pattern = "0010" and r_i_Pattern /= "0010" then    --rising edge  
+            
+            if r_chip_counter = 6 then
+                r_chip_counter <= 0;                          --index 0 is unused because it cannot first be displayed
+            else                                                --can be done manually ex: w_string <= stringmap(0)
+                r_chip_counter <= r_chip_counter + 1;    
+            end if;
+
+         end if;
+
+    end if;
+
+  end process chip_counter;
+
+  
+  w_x_pos_chip <= c_x_pos_chipmap(r_chip_counter);
+  w_y_pos_chip <= c_y_pos_chipmap(r_chip_counter);   
+
+    --Pattern_Red(2) <= (others => '1') when draw_table = '1' else 
+--(others => '0');
+    
+    -- Pattern_Red(2) <= (others => '1') when    (
+--                                             ((to_integer(unsigned(w_Col_Count)) - ((g_ACTIVE_COLS - dual_dice_bitmap(0)'high)/2) > -1 and
+--                                             to_integer(unsigned(w_Row_Count)) - ((g_ACTIVE_ROWS - dual_dice_bitmap'high)/2) > -1 and
+--                                             to_integer(unsigned(w_Col_Count)) - (g_ACTIVE_COLS - dual_dice_bitmap(0)'high)/2 < dual_dice_bitmap(0)'high + 1 and
+--                                             to_integer(unsigned(w_Row_Count)) - ((g_ACTIVE_ROWS - dual_dice_bitmap'high)/2) < dual_dice_bitmap'high + 1) and
+--                                             (dual_dice_bitmap(to_integer(unsigned(w_Row_Count)) - ((g_ACTIVE_ROWS - dual_dice_bitmap'high)/2))(to_integer(unsigned(w_Col_Count)) - ((g_ACTIVE_COLS - dual_dice_bitmap(0)'high)/2)) = '1'))
+                                             
 --                                             )
 --                                      else
 --                                            (others => '0');
 
 
-Pattern_Red(2) <= (others => '1') when    (
-                                            ((to_integer(unsigned(w_Col_Count)) - ((g_ACTIVE_COLS - dual_dice_bitmap(0)'high)/2) > -1 and
-                                            to_integer(unsigned(w_Row_Count)) - ((g_ACTIVE_ROWS - dual_dice_bitmap'high)/2) > -1 and
-                                            to_integer(unsigned(w_Col_Count)) - (g_ACTIVE_COLS - dual_dice_bitmap(0)'high)/2 < dual_dice_bitmap(0)'high + 1 and
-                                            to_integer(unsigned(w_Row_Count)) - ((g_ACTIVE_ROWS - dual_dice_bitmap'high)/2) < dual_dice_bitmap'high + 1) and
-                                            (dual_dice_bitmap(to_integer(unsigned(w_Row_Count)) - ((g_ACTIVE_ROWS - dual_dice_bitmap'high)/2))(to_integer(unsigned(w_Col_Count)) - ((g_ACTIVE_COLS - dual_dice_bitmap(0)'high)/2)) = '1'))
-                                             
-                                            )
-                                     else
-                                           (others => '0');
-
                                           
 
-  Pattern_Grn(2) <= Pattern_Red(2);
-  Pattern_Blu(2) <= Pattern_Red(2);
+  --Pattern_Grn(2) <= Pattern_Red(2);
+  --Pattern_Blu(2) <= Pattern_Red(2);
   
   -----------------------------------------------------------------------------
   -- Pattern 3: All Blue
