@@ -70,30 +70,7 @@ package VGA_pkg is
             (400)
         );
 
-        --x and y position arrays for red chip
-    type t_x_pos_chipmap is array (0 to 6) of integer;
-        constant c_x_pos_chipmap : t_x_pos_chipmap :=
-        (
-            (80),--0
-            (155),--4
-            (238),--5
-            (320),--6
-            (402),--8
-            (485),--9
-            (568)--10
-        );
-
-    type t_y_pos_chipmap is array (0 to 6) of integer;
-        constant c_y_pos_chipmap : t_y_pos_chipmap :=
-        (
-            (23),
-            (23),
-            (23),
-            (23),
-            (23),
-            (23),
-            (23)
-        );    
+        
   
 
 
