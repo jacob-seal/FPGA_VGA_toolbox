@@ -23,6 +23,7 @@
 --o_COL_2 - 
 --o_COL_1 - 
 -- o_Decoded - the value of the pressed button in binary 
+-- o_DV - data valid flag. Asserts with a match has been found.
 --
 --The I/O from the PMOD interface should be assigned as follows:
 --o_COL_4 - io_PMOD_1
@@ -56,7 +57,8 @@ entity Keypad_Wrapper is
     o_COL_2 : out std_logic;
     o_COL_1 : out std_logic;
     --decoded output
-    o_Decoded : out std_logic_vector(3 downto 0)	
+    o_Decoded : out std_logic_vector(3 downto 0);
+    o_DV : out std_logic --data valid flag	
     );
 end Keypad_Wrapper;
 
@@ -70,8 +72,13 @@ architecture RTL of Keypad_Wrapper is
     signal w_decoded_2 : std_logic_vector(3 downto 0);
     signal w_decoded_3 : std_logic_vector(3 downto 0);
 
+    --data valid flag
+    signal w_DV : std_logic := '0';
+
+    --output signal from clock divider
     signal w_clk_div : std_logic;
 
+    --declaration of all components
     component clock_div_pow2 is
         port(
             i_clk         : in  std_logic;
@@ -88,12 +95,13 @@ architecture RTL of Keypad_Wrapper is
 			    i_Clk : in  STD_LOGIC;
                 i_Row : in  STD_LOGIC_VECTOR (3 downto 0);
 			    o_Col : out  STD_LOGIC_VECTOR (3 downto 0);
+                o_DV : out std_logic; --data valid flag
                 o_Decoded : out  STD_LOGIC_VECTOR (3 downto 0)
                 );
     end component;    
 	
 	begin    
-    --assign Row inputs to 
+    --assign Row inputs
     w_Rows(0) <= i_ROW_4;
     w_Rows(1) <= i_ROW_3;
     w_Rows(2) <= i_ROW_2;
@@ -124,42 +132,20 @@ architecture RTL of Keypad_Wrapper is
             i_Clk => w_clk_div,
             i_Row => w_Rows,
             o_Col => w_Cols,
+            o_DV => w_DV,
             o_Decoded => w_decoded
         );
     
-
-		
-
-		
-		
-		
-		
+    --double flop the output of the decoder to prevent metastability when going back to higher clock speed
+    w_decoded_2 <= w_decoded; 
+    w_decoded_3 <= w_decoded_2; 
 
 	--***********************************************************************************************************************************
 	--end module instantiation
 	--***********************************************************************************************************************************
 	
-	--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	--all processes in the next section
-	--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	--end of processes
-	--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	
-	
-	
-	--double flop the output of the decoder to prevent metastability
-    w_decoded_2 <= w_decoded; 
-    w_decoded_3 <= w_decoded_2;           
+
+	          
    
 	
 	--set outputs
@@ -169,6 +155,7 @@ architecture RTL of Keypad_Wrapper is
     o_COL_1 <= w_COLS(3);
 
     o_Decoded <= w_decoded_3;
+    o_DV <= w_DV;
 	
 	
 end RTL;

@@ -28,8 +28,6 @@ USE ieee.numeric_std.ALL;
     -- Function Declarations
     -----------------------------------------------------------------------------
 
-
-
     function f_log2 (x : positive) return natural;
     
     -----------------------------------------------------------------------------
@@ -159,7 +157,8 @@ USE ieee.numeric_std.ALL;
                     o_COL_2 : out std_logic;
                     o_COL_1 : out std_logic;
                     --decoded output
-                    o_Decoded : out std_logic_vector(3 downto 0)	
+                    o_Decoded : out std_logic_vector(3 downto 0);
+                    o_DV : out std_logic	
                     );
         end component;   
 
@@ -167,6 +166,10 @@ USE ieee.numeric_std.ALL;
     end package;
 
     package body my_Useful_Utils_pkg is
+
+    -----------------------------------------------------------------------------
+    -- Function bodies
+    -----------------------------------------------------------------------------
 
     --function returns the log base 2 of a number(input needs to be power of 2)
     function f_log2 (x : positive) return natural is

@@ -23,6 +23,7 @@
 -- o_Col - column that we are currently scanning. this goes as feedback to the 
 --         device itself 
 -- o_Decoded - the value of the pressed button in binary 
+-- o_DV - data valid flag. Asserts with a match has been found. 
 --********************************************************************************
 ----------------------------------------------------------------------------------
 library ieee;
@@ -34,6 +35,7 @@ entity Keypad_Decoder is
 			    i_Clk : in  STD_LOGIC;
                 i_Row : in  STD_LOGIC_VECTOR (3 downto 0);
 			    o_Col : out  STD_LOGIC_VECTOR (3 downto 0);
+                o_DV : out std_logic; --data valid flag
                 o_Decoded : out  STD_LOGIC_VECTOR (3 downto 0));
 end Keypad_Decoder;
 
@@ -47,11 +49,15 @@ signal w_Row : std_logic_vector(3 downto 0);
 signal w_Col : std_logic_vector(3 downto 0);
 signal w_Decoded : std_logic_vector(3 downto 0);
 
+--data valid flag
+signal w_DV : std_logic := '0';
+
 begin
 
---assign inputs
+    --assign inputs
     w_Row <= i_Row;
-	--process to increment the column switch counter
+	
+    --process to increment the column switch counter
     counter_proc : process (i_Clk)
     begin
         if rising_edge(i_Clk) then
@@ -91,64 +97,84 @@ begin
         if rising_edge(i_Clk) then
             case w_Col is
                 when "0111" =>
+                    --reset data valid flag with each iteration
+                    w_DV <= '0';
                     --R1
                     if w_Row = "0111" then
                         w_Decoded <= "0001";	--1
+                        w_DV <= '1';
                     --R2
                     elsif w_Row = "1011" then
                         w_Decoded <= "0100"; --4
+                        w_DV <= '1';
                     --R3
                     elsif w_Row = "1101" then
                         w_Decoded <= "0111"; --7
+                        w_DV <= '1';
                     --R4
                     elsif w_Row = "1110" then
                         w_Decoded <= "0000"; --0
+                        w_DV <= '1';
                     end if;
                 when "1011" =>
                     --R1
                     if w_Row = "0111" then		
                         w_Decoded <= "0010"; --2
+                        w_DV <= '1';
                     --R2
                     elsif w_Row = "1011" then
                         w_Decoded <= "0101"; --5
+                        w_DV <= '1';
                     --R3
                     elsif w_Row = "1101" then
                         w_Decoded <= "1000"; --8
+                        w_DV <= '1';
                     --R4
                     elsif w_Row = "1110" then
                         w_Decoded <= "1111"; --F
+                        w_DV <= '1';
                     end if;
                 when "1101" =>
                     --R1
                     if w_Row = "0111" then
-                        w_Decoded <= "0011"; --3	
+                        w_Decoded <= "0011"; --3
+                        w_DV <= '1';	
                     --R2
                     elsif w_Row = "1011" then
                         w_Decoded <= "0110"; --6
+                        w_DV <= '1';
                     --R3
                     elsif w_Row = "1101" then
                         w_Decoded <= "1001"; --9
+                        w_DV <= '1';
                     --R4
                     elsif w_Row = "1110" then
                         w_Decoded <= "1110"; --E
+                        w_DV <= '1';
                     end if;
                 when "1110" =>    
                     --R1
                     if w_Row = "0111" then
                         w_Decoded <= "1010"; --A
+                        w_DV <= '1';
                     --R2
                     elsif w_Row = "1011" then
                         w_Decoded <= "1011"; --B
+                        w_DV <= '1';
                     --R3
                     elsif w_Row = "1101" then
                         w_Decoded <= "1100"; --C
+                        w_DV <= '1';
                     --R4
                     elsif w_Row = "1110" then
                         w_Decoded <= "1101"; --D
+                        w_DV <= '1';
                     end if;
             
+                -- when others =>
+                --     null;
                 when others =>
-                    null;
+                    w_DV <= '0';
             end case;            
         end if;
     end process;
@@ -156,5 +182,6 @@ begin
     --assign outputs
     o_Col <= w_Col;
     o_Decoded <= w_Decoded;
+    o_DV <= w_DV;
 end Behavioral;
 
