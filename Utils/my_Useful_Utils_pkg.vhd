@@ -143,17 +143,25 @@ USE ieee.numeric_std.ALL;
                     );
         end component;
 
-  
-
-
-    
-
-        
- 
-
-
-
-    
+        component Keypad_Wrapper is
+            port    (
+                    --clock input 100 MHz
+                    i_Clk   : in  std_logic;
+                    
+                    --IO for the rows and columns(PMOD at top level)
+                    i_ROW_4 : in std_logic;
+                    i_ROW_3 : in std_logic;
+                    i_ROW_2 : in std_logic;
+                    i_ROW_1 : in std_logic;
+                    
+                    o_COL_4 : out std_logic;
+                    o_COL_3 : out std_logic;
+                    o_COL_2 : out std_logic;
+                    o_COL_1 : out std_logic;
+                    --decoded output
+                    o_Decoded : out std_logic_vector(3 downto 0)	
+                    );
+        end component;   
 
         
     end package;
